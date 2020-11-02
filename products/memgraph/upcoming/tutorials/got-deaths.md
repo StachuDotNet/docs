@@ -1,4 +1,4 @@
-## Game of Thrones kills/deaths
+## Game of Thrones deaths
 
 This article is a part of a series intended to show how to use Memgraph
 on real-world data to retrieve some interesting and useful
@@ -29,13 +29,13 @@ Now, the data we'll be using in our queries can be classified as follows:
       episode corresponding to the IMDB rating of the episode (e.g. "9.1")
     * a "Season" node has a "number" attribute corresponding to the number of the season (e.g. "10")
     * a "Character" node has a "name" attribute corresponding to the character's name (e.g. "Castle Black")
-  * edges, of type "KilledBy", "Killed","LoyalTo", "Died", "InEpisode", "InSeason", or "InLocation"
+  * edges, of type "KilledBy", "Killed","LoyalTo", "VictimIn","KillerIn", "InEpisode", "InSeason", or "InLocation"
     * edges "KilledBy" and "Killed" connect two Character nodes and they have 2 attributes, 
       "method" which says how was the character killed (e.g. "Knife") and "count" attributes which says
       how many of these characters was killed (e.g. if "Jon Snow" killed 10 "Lannister soldiers" then on 
       this path "count" would be "10")
     * edge "LoyalTo" connects "Character" node with "Allegiance" node
-    * edges "Died" and "Killed" connects "Character" node with "Death" node
+    * edges "VictimIn" and "KillerIn" connects "Character" node with "Death" node
     * edge "InLocation" connects node "Death" with "Location" node
     * edge "InEpisode" connects node "Death" node "Episode"
     * edge "InSeason" connects nodes "Death" and "Episode" with "Season" node
@@ -129,7 +129,7 @@ RETURN Method, c2.name as Victim
 
 ```opencypher
 MATCH (c:Character {name: 'Daenerys Targaryen'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:Killed]->(d:Death)<-[:Died]-(c2)
+MATCH (c)-[:KillerIn]->(d:Death)<-[:VictimIn]-(c2)
 MATCH (d)-[:InEpisode]-(e:Episode)
 return distinct(c2.name) as Victim, COUNT(d) as Kills, e.name
 ORDER BY Kills DESC
@@ -139,8 +139,8 @@ ORDER BY Kills DESC
 
 ```opencypher
 MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:Died]->(d2:Death)
-MATCH (c)-[:Killed]->(d:Death)<-[:Died]-(c2)
+MATCH (c)-[:VictimIn]->(d2:Death)
+MATCH (c)-[:KillerIn]->(d:Death)<-[:VictimIn]-(c2)
 WHERE d.order>d2.order
 return distinct(c2.name) as Victim, COUNT(d) as Kills
 ORDER BY Kills DESC
@@ -160,7 +160,7 @@ ORDER BY KD DESC;
 
 ```opencypher
 MATCH (c:Character)-[:LoyalTo]->(a:Allegiance)
-MATCH (c)-[:Died]-(d:Death)-[:InEpisode]-(e:Episode {name: 'Battle of the Bastards'})
+MATCH (c)-[:VictimIn]-(d:Death)-[:InEpisode]-(e:Episode {name: 'Battle of the Bastards'})
 RETURN a.name AS HouseName, COUNT(d) AS DeathCount
 ORDER BY DeathCount DESC
 LIMIT 2;
@@ -185,36 +185,9 @@ match (c:Character)-[i:LoyalTo]-(l) return c,i,l;
 
 ```opencypher
 MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:Killed]->(d:Death)<-[di:Died]-(c2)
+MATCH (c)-[:KillerIn]->(d:Death)<-[di:VictimIn]-(c2)
 MATCH (d)-[i:InLocation]->(l:Location)
 return c2,di,d,i,l
-```
-
-You can see the nodes and relationships but it will probably not be visible which node is which. Click on `Style editor` in the bottom right corner and run this script.
-
-```
-@NodeStyle {
-  size: 25
-  border-width: 2.5
-  color-selected: red
-  color-hover: red
-}
-
-@NodeStyle HasProperty?(node, "name") {
-  label: Property(node, "name")
-}
-
-@NodeStyle HasLabel?(node, "Location") {
-  color: orange
-}
-
-@NodeStyle HasLabel?(node, "Death") {
-  color: purple
-}
-
-@EdgeStyle {
-  width: 2
-}
 ```
 
 13) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most gruesome path of kills.
@@ -231,7 +204,3 @@ pages:
 
 * [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
 * [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
-
-
-
-
