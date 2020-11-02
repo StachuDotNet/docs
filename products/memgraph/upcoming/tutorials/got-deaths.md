@@ -9,13 +9,25 @@ are listed in our [tutorial overview section](tutorials-overview.md).
 
 ### Introduction
 
-**WARNING** - If you've been living under a rock and still have not watched Game of Thrones, this tutorial could contain ***spoilers***. 
+**WARNING** - If you've been living under a rock and still have not watched Game of Thrones,
+this tutorial could contain ***spoilers***. 
 
-We can all agree that 2020. was one of the worst years in our lives because of the worldwide pandemic, 2019. still comes close with that disappointing, poorly written ending to one of the best shows of all time, Game of Thrones. Seven-year build-up to that awful last season crushed the souls of millions of fans around the world. Nevertheless, the Game of Thrones world is full of interesting characters, locations, scenarios, and most importantly deaths. If you want to know how many characters would survive if Jon Snow stayed dead, which House has the best Kill/Death Ratio or who was the biggest traitor in the show, you have come to the right place!
+We can all agree that 2020. was one of the worst years in our lives because of the worldwide
+pandemic, 2019. still comes close with that disappointing, poorly written ending to one of the
+best shows of all time, Game of Thrones. Seven-year build-up to that awful last season crushed
+the souls of millions of fans around the world. Nevertheless, the Game of Thrones world is full
+of interesting characters, locations, scenarios, and most importantly deaths. If you want to know
+how many characters would survive if Jon Snow stayed dead, which House has the best Kill/Death Ratio
+or who was the biggest traitor in the show, you have come to the right place!
 
 ### Data Model
 
-Although you know the Game of Thrones TV show is based on series of books called A Song of Ice and Fire, our graph database contains only characters from said TV shows as books are still not finished. This tutorial would not be possible with data analyst David Murphy who shared his collection of on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths). Some of the rules you have to take into concern are that kills that happened off-screen and undead(wraiths) are not counted. The dataset we used was slightly modified, to be precise, columns "Episode Name" and "IMDb Rating" were added.
+Although you know the Game of Thrones TV show is based on series of books called A Song of Ice and
+Fire, our graph database contains only characters from said TV shows as books are still not finished.
+This tutorial would not be possible with data analyst David Murphy who shared his collection of
+on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths). Some of the rules you have to take into concern are that kills that
+happened off-screen and undead(wraiths) are not counted. The dataset we used was slightly modified, to 
+be precise, columns "Episode Name" and "IMDb Rating" were added.
 
 Now, the data we'll be using in our queries can be classified as follows:
   * nodes, labeled as "Character", "Allegiance", "Death", "Episode", "Season", or "Location"
@@ -81,7 +93,8 @@ to query Memgraph via the console.
 Here are some queries you might find interesting:
 
 **MINI-GAME** - If you have watched the TV Show, try to guess each result before executing the query!
-1) Let's start with a couple of simple queries. List the locations with the most deaths occurred. Can you guess which one is it?
+1) Let's start with a couple of simple queries. List the locations with the most deaths occurred.
+Can you guess which one is it?
 
 ```opencypher
 MATCH (l:Location)<-[:InLocation]-(d:Death) 
@@ -89,7 +102,8 @@ return l.name AS LocationName, COUNT(d) AS DeathCount
 ORDER BY DeathCount DESC
 ```
 
-2) Now that we have the location with the most deaths, let's list the episodes with the most deaths as well.
+2) Now that we have the location with the most deaths, let's list the episodes with the most deaths
+as well.
 
 ```opencypher
 MATCH (d:Death)-[:InEpisode]->(e:Episode)
@@ -105,8 +119,9 @@ RETURN s.number AS SeasonNumber, COUNT(d) as DeathNumber
 ORDER BY SeasonNumber ASC
 ```
 
-4) While we know which season was by far the worst, can you guess the best one based on user ratings? Let's list the seasons by IMDB ratings.
-The problem we get with using the `AVG()` function is that it gives us too many decimals, therefore a useful solution is given in this example using `ROUND()`.
+4) While we know which season was by far the worst, can you guess the best one based on user ratings?
+Let's list the seasons by IMDB ratings. The problem we get with using the `AVG()` function is that it
+gives us too many decimals, therefore a useful solution is given in this example using `ROUND()`.
 
 ```opencypher
 MATCH (e:Episode)-[:InSeason]->(s:Season) 
@@ -114,7 +129,8 @@ RETURN s.number AS SeasonName, ROUND(100 * AVG(e.imdb_rating))/100 AS Rating
 ORDER BY Rating DESC
 ```
 
-5) There are many methods characters died with such as with sword or Dragonfire, but let's list victims of unique methods.
+5) There are many methods characters died with such as with sword or Dragonfire, but let's list victims
+of unique methods.
 
 ```opencypher
 MATCH (c:Character)-[k:Killed]->(c2:Character)
@@ -125,7 +141,10 @@ WHERE k.method = Method
 RETURN Method, c2.name as Victim
 ```
 
-6) Daenerys Stormborn of House Targaryen, the First of Her Name, Queen of the Andals and the First Men, Protector of the Seven Kingdoms, the Mother of Dragons, the Khaleesi of the Great Grass Sea, the Unburnt, the Breaker of Chains or shortened to "Daenerys Targaryen" in our database is by far the biggest killer on the show. Let's list all the episodes she killed in as well as characters she killed.
+6) Daenerys Stormborn of House Targaryen, the First of Her Name, Queen of the Andals and the First Men,
+Protector of the Seven Kingdoms, the Mother of Dragons, the Khaleesi of the Great Grass Sea, the Unburnt,
+the Breaker of Chains or shortened to "Daenerys Targaryen" in our database is by far the biggest killer on
+the show. Let's list all the episodes she killed in as well as characters she killed.
 
 ```opencypher
 MATCH (c:Character {name: 'Daenerys Targaryen'})-[k:Killed]->(c2:Character)
@@ -135,7 +154,8 @@ return distinct(c2.name) as Victim, COUNT(d) as Kills, e.name
 ORDER BY Kills DESC
 ```
 
-7) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought he was gonna stay dead? Well, let's list all the characters that would survive if he actually stayed dead.
+7) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought
+he was gonna stay dead? Well, let's list all the characters that would survive if he actually stayed dead.
 
 ```opencypher
 MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
@@ -146,7 +166,10 @@ return distinct(c2.name) as Victim, COUNT(d) as Kills
 ORDER BY Kills DESC
 ```
 
-8) Houses or allegiances are one of the main aspects of Westeros. We know some houses killed more characters than others, but that doesn't matter in the end, what matters is efficiency. Let's list the allegiances with the best Kill/Death Ratios. Here we came across one more problem, if an allegiance had more deaths than kills, the KD would be 0. This can easily be fixed with the `toFloat()` function.
+8) Houses or allegiances are one of the main aspects of Westeros. We know some houses killed more characters
+than others, but that doesn't matter in the end, what matters is efficiency. Let's list the allegiances with
+the best Kill/Death Ratios. Here we came across one more problem, if an allegiance had more deaths than kills,
+the KD would be 0. This can easily be fixed with the `toFloat()` function.
 
 ```opencypher
 MATCH (c:Character)-[death:Killed]->(c2:Character)-[l:LoyalTo]->(a:Allegiance)
@@ -156,7 +179,8 @@ RETURN a.name, sum(kill.count) as Kills, Deaths, ROUND(100 *(toFLoat(sum(kill.co
 ORDER BY KD DESC;
 ```
 
-9) One of the best-rated episodes, Battle of the Bastards, showed us a fight between two houses: Stark and Bolton. Let's see which one had more casualties.
+9) One of the best-rated episodes, Battle of the Bastards, showed us a fight between two houses: Stark and Bolton.
+Let's see which one had more casualties.
 
 ```opencypher
 MATCH (c:Character)-[:LoyalTo]->(a:Allegiance)
@@ -175,13 +199,15 @@ RETURN c.name AS Traitor, COUNT(c2) AS Kills
 ORDER BY Kills DESC
 ```
 
-11) One of the biggest features of Memgraph is drawing the graphs of queries we execute. Let's visualize all the Loyalties with Characters. Execute the following query and head out to `GRAPH` tab.
+11) One of the biggest features of Memgraph is drawing the graphs of queries we execute. Let's visualize all the
+Loyalties with Characters. Execute the following query and head out to `GRAPH` tab.
 
 ```opencypher
 match (c:Character)-[i:LoyalTo]-(l) return c,i,l;
 ```
 
-12) Memgraphs LAB can also customize each one of the nodes. Let's see how it looks like if we want to visualize Jon Snow kills with its locations.
+12) Memgraphs LAB can also customize each one of the nodes. Let's see how it looks like if we want to visualize Jon
+Snow kills with its locations.
 
 ```opencypher
 MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
@@ -190,7 +216,8 @@ MATCH (d)-[i:InLocation]->(l:Location)
 return c2,di,d,i,l
 ```
 
-13) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most gruesome path of kills.
+13) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most
+gruesome path of kills.
 
 ```opencypher
 MATCH p = (:Character)-[:Killed * wShortest (e,v | e.count) total_weight]->(:Character)
