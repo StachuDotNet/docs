@@ -206,8 +206,7 @@ Loyalties with Characters. Execute the following query and head out to `GRAPH` t
 match (c:Character)-[i:LoyalTo]-(l) return c,i,l;
 ```
 
-12) Memgraphs LAB can also customize each one of the nodes. Let's see how it looks like if we want to visualize Jon
-Snow kills with its locations.
+12) Let's see how it looks like if we want to visualize Jon Snow kills with its locations.
 
 ```opencypher
 MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
