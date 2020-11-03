@@ -9,48 +9,48 @@ are listed in our [tutorial overview section](tutorials-overview.md).
 
 ### Introduction
 
-**WARNING** - If you've been living under a rock and still have not watched Game of Thrones,
-this tutorial could contain ***spoilers***. 
+**WARNING** - this tutorial could contain Game of Thrones ***spoilers***.  
 
-We can all agree that 2020. was one of the worst years in our lives because of the worldwide
-pandemic, 2019. still comes close with that disappointing, poorly written ending to one of the
-best shows of all time, Game of Thrones. Seven-year build-up to that awful last season crushed
-the souls of millions of fans around the world. Nevertheless, the Game of Thrones world is full
-of interesting characters, locations, scenarios, and most importantly deaths. If you want to know
-how many characters would survive if Jon Snow stayed dead, which House has the best Kill/Death Ratio
-or who was the biggest traitor in the show, you have come to the right place!
+Game of Thrones is an American fantasy drama television series created by David Benioff and D. B. Weiss for HBO.
+It is an adaptation of A Song of Ice and Fire, George R. R. Martin's series of fantasy novels,  the first of which is
+A Game of Thrones. The Game of Thrones world is full of interesting characters, locations, scenarios, unexpected deaths, and plot twists.
+
+Even though, the COVID-19 pandemic hit the entire world in 2020 and is now starting to become one of the worst
+years in recent history, 2019 was also a huge disappointment to all the Game of Thrones fans. According to IMDb ratings, a seven-year 
+build-up resulted in a poorly written ending of the last season and ruined the ending of one of the most popular shows on the planet.  
+Nonetheless, if you want to know how many characters would have survived if Jon Snow had stayed dead, which House had the best Kill/Death Ratio
+or who was the biggest traitor in the show, you came to the right place!
 
 ### Data Model
 
-Although you know the Game of Thrones TV show is based on series of books called A Song of Ice and
-Fire, our graph database contains only characters from said TV shows as books are still not finished.
-This tutorial would not be possible with data analyst David Murphy who shared his collection of
-on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths). Some of the rules you have to take into concern are that kills that
-happened off-screen and undead(wraiths) are not counted. The dataset we used was slightly modified, to 
-be precise, columns "Episode Name" and "IMDb Rating" were added.
+Although the Game of Thrones TV show is based on series of books, our graph database contains only characters from 
+previously mentioned TV shows as books are still not finished. This tutorial would not be possible with data analyst David 
+Murphy who shared his collection of on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths).We won't we working with kills and deaths that happened off-screen or were 
+tied to undeads (wraiths). The dataset we used was slightly modified, columns "Episode Name" and "IMDb Rating" were added.
 
-Now, the data we'll be using in our queries can be classified as follows:
-  * nodes, labeled as "Character", "Allegiance", "Death", "Episode", "Season", or "Location"
-    * a "Character" node has a "name" attribute corresponding to the character's name (e.g. "Jon Snow")
-    * an "Allegiance" node has a "name" attribute corresponding to the house name the character 
-      is loyal to (e.g.  "House Stark")
-    * a "Death" node has an "order" attribute corresponding to the order in which the death happened 
-      in show (e.g. "602")
-    * an "Episode" node has a "number" attribute corresponding to the number of episodes (e.g. "10"), 
-      "name" attribute corresponding to the name of the episode (e.g. "Mothers Mercy") and "imdb_rating"
-      episode corresponding to the IMDB rating of the episode (e.g. "9.1")
-    * a "Season" node has a "number" attribute corresponding to the number of the season (e.g. "10")
-    * a "Character" node has a "name" attribute corresponding to the character's name (e.g. "Castle Black")
-  * edges, of type "KilledBy", "Killed","LoyalTo", "VictimIn","KillerIn", "InEpisode", "InSeason", or "InLocation"
-    * edges "KilledBy" and "Killed" connect two Character nodes and they have 2 attributes, 
-      "method" which says how was the character killed (e.g. "Knife") and "count" attributes which says
-      how many of these characters was killed (e.g. if "Jon Snow" killed 10 "Lannister soldiers" then on 
-      this path "count" would be "10")
-    * edge "LoyalTo" connects "Character" node with "Allegiance" node
-    * edges "VictimIn" and "KillerIn" connects "Character" node with "Death" node
-    * edge "InLocation" connects node "Death" with "Location" node
-    * edge "InEpisode" connects node "Death" node "Episode"
-    * edge "InSeason" connects nodes "Death" and "Episode" with "Season" node
+The model consists of the following nodes:
+* a `Character` node has a "name" attribute corresponding to the character's name (e.g. `"Jon Snow"`)
+* an `Allegiance` node has a "name" attribute corresponding to the house name the character 
+    is loyal to (e.g.  `"House Stark"`)
+* a `Death` node has an "order" attribute corresponding to the order in which the death happened 
+    in show (e.g. `602`)
+* an `Episode` node has a "number" attribute corresponding to the number of episodes (e.g. `10`), 
+    `name` attribute corresponding to the name of the episode (e.g. `"Mothers Mercy"`) and `imdb_rating`
+    episode corresponding to the IMDB rating of the episode (e.g. "9.1")
+* a `Season` node has a `number` attribute corresponding to the number of the season (e.g. `10`)
+* a `Character` node has a `name` attribute corresponding to the character's name (e.g. `"Castle Black"`)
+
+Nodes are connected with the following edges:
+* `:KILLED_BY` and `:KILLED` - connect two Character nodes and they have 2 attributes, 
+  `method` which says how was the character killed (e.g. `"Knife"`) and `count` attributes representing an
+  number of how many of these characters was killed (e.g. if `"Jon Snow"` killed `10` `"Lannister soldiers"` 
+  then on this path `count` would be `10`)
+* `:LOYAL_TO` - connects `Character` node with `Allegiance` node representing an allegiance the character is
+  loyal to
+* `:DIED_IN` and `:KILLED_IN` - connects `Character` node with `Death` node in which death happened 
+* `:HAPPENED_IN` - connects node `Death` with `Episode`, `Season` and `Location` nodes representing details
+  of death
+* `:PART_OF` connects node `Episode` with `Season` node which episode is part of
 
 ### Importing the Snapshot
 
@@ -59,7 +59,7 @@ import it when starting Memgraph using the `--data-directory` option.
 
 ```plaintext
 sudo -u memgraph \
-  /usr/lib/memgraph/memgraph --data-directory /usr/share/memgraph/examples/Got \
+  /usr/lib/memgraph/memgraph --data-directory /usr/share/memgraph/examples/got \
     --storage-snapshot-interval-sec=0 --storage-wal-enabled=false \
     --storage-snapshot-on-exit=false --storage-properties-on-edges=true
 ```
@@ -77,7 +77,7 @@ When using Docker, the example can be imported with the following command:
 ```plaintext
 docker run -p 7687:7687 \
   -v mg_lib:/var/lib/memgraph -v mg_log:/var/log/memgraph -v mg_etc:/etc/memgraph \
-  memgraph --data-directory /usr/share/memgraph/examples/Got \
+  memgraph --data-directory /usr/share/memgraph/examples/got \
   --storage-snapshot-interval-sec=0 --storage-wal-enabled=false \
   --storage-snapshot-on-exit=false --storage-properties-on-edges=true
 ```
@@ -93,135 +93,136 @@ to query Memgraph via the console.
 Here are some queries you might find interesting:
 
 **MINI-GAME** - If you have watched the TV Show, try to guess each result before executing the query!
-1) Let's start with a couple of simple queries. List the locations with the most deaths occurred.
+1) Let's start with a couple of simple queries. List the locations where most deaths occurred.
 Can you guess which one is it?
 
 ```opencypher
-MATCH (l:Location)<-[:InLocation]-(d:Death) 
-return l.name AS LocationName, COUNT(d) AS DeathCount
-ORDER BY DeathCount DESC
+MATCH (l:Location)<-[:HAPPENED_IN]-(d:Death) 
+RETURN l.name AS location_name, COUNT(d) AS death_count
+ORDER BY death_count DESC
 ```
 
 2) Now that we have the location with the most deaths, let's list the episodes with the most deaths
 as well.
 
 ```opencypher
-MATCH (d:Death)-[:InEpisode]->(e:Episode)
-RETURN e.name, COUNT(d) AS KillCount
-ORDER BY KillCount DESC
+MATCH (d:Death)-[:HAPPENED_IN]->(e:Episode)
+RETURN e.name AS episode_name, COUNT(d) AS kill_count
+ORDER BY kill_count DESC
 ```
 
-3) List the number of kills per season. I think we all know the highest count one. 
+3) List the number of kills per season. If you have watched the show, you should guess this one.
 
 ```opencypher
-MATCH (d:Death)-[:InSeason]->(s:Season) 
-RETURN s.number AS SeasonNumber, COUNT(d) as DeathNumber
-ORDER BY SeasonNumber ASC
+MATCH (d:Death)-[:HAPPENED_IN]->(s:Season) 
+RETURN s.number AS season_number, COUNT(d) AS death_count
+ORDER BY season_number ASC
 ```
 
-4) While we know which season was by far the worst, can you guess the best one based on user ratings?
+4) Worst season by far, based on user ratings, is the last one, but can you guess the best one?
 Let's list the seasons by IMDB ratings. The problem we get with using the `AVG()` function is that it
 gives us too many decimals, therefore a useful solution is given in this example using `ROUND()`.
 
 ```opencypher
-MATCH (e:Episode)-[:InSeason]->(s:Season) 
-RETURN s.number AS SeasonName, ROUND(100 * AVG(e.imdb_rating))/100 AS Rating
-ORDER BY Rating DESC
+MATCH (e:Episode)-[:PART_OF]->(s:Season) 
+RETURN s.number AS season_name, ROUND(100 * AVG(e.imdb_rating))/100 AS rating
+ORDER BY rating DESC
 ```
 
-5) There are many methods characters died with such as with sword or Dragonfire, but let's list victims
+5) There are many methods by which characters were killed such as sword or Dragonfire, but let's list victims
 of unique methods.
 
 ```opencypher
-MATCH (c:Character)-[k:Killed]->(c2:Character)
-WITH k.method AS Method, COUNT(k.method) AS MethodCount
-WHERE MethodCount < 2
-MATCH (c:Character)-[k:Killed]->(c2:Character)
-WHERE k.method = Method
-RETURN Method, c2.name as Victim
+MATCH (:Character)-[k:KILLED]->(:Character)
+WITH k.method AS kill_method, COUNT(k.method) AS method_count
+WHERE method_count < 2
+MATCH (killer:Character)-[k:KILLED]->(victim:Character)
+WHERE k.method = kill_method
+RETURN kill_method, victim.name AS victim
 ```
 
 6) Daenerys Stormborn of House Targaryen, the First of Her Name, Queen of the Andals and the First Men,
 Protector of the Seven Kingdoms, the Mother of Dragons, the Khaleesi of the Great Grass Sea, the Unburnt,
-the Breaker of Chains or shortened to "Daenerys Targaryen" in our database is by far the biggest killer on
+the Breaker of Chains or shortened to "Daenerys Targaryen" in our database is the biggest killer on
 the show. Let's list all the episodes she killed in as well as characters she killed.
 
 ```opencypher
-MATCH (c:Character {name: 'Daenerys Targaryen'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:KillerIn]->(d:Death)<-[:VictimIn]-(c2)
-MATCH (d)-[:InEpisode]-(e:Episode)
-return distinct(c2.name) as Victim, COUNT(d) as Kills, e.name
-ORDER BY Kills DESC
+MATCH (daenerys:Character {name: 'Daenerys Targaryen'})-[:KILLED]->(victim:Character)
+MATCH (daenerys)-[:KILLED_IN]->(d:Death)<-[:DIED_IN]-(victim)
+MATCH (d)-[:HAPPENED_IN]-(e:Episode)
+RETURN DISTINCT(victim.name) AS victim, COUNT(d) AS kill_count, e.name AS episode_name
+ORDER BY kill_count DESC
 ```
 
 7) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought
 he was gonna stay dead? Well, let's list all the characters that would survive if he actually stayed dead.
 
 ```opencypher
-MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:VictimIn]->(d2:Death)
-MATCH (c)-[:KillerIn]->(d:Death)<-[:VictimIn]-(c2)
-WHERE d.order>d2.order
-return distinct(c2.name) as Victim, COUNT(d) as Kills
-ORDER BY Kills DESC
+MATCH (jon:Character {name: 'Jon Snow'})-[:KILLED]->(victim:Character)
+MATCH (jon)-[:DIED_IN]->(jon_death:Death)
+MATCH (jon)-[:KILLED_IN]->(victim_death:Death)<-[:DIED_IN]-(victim)
+WHERE victim_death.order>jon_death.order
+RETURN DISTINCT(victim.name) AS victim, COUNT(victim_death) AS kill_count
+ORDER BY kill_count DESC
 ```
 
-8) Houses or allegiances are one of the main aspects of Westeros. We know some houses killed more characters
+8) Houses or allegiances are one of the main aspects of Westeros. Some houses killed more characters
 than others, but that doesn't matter in the end, what matters is efficiency. Let's list the allegiances with
-the best Kill/Death Ratios. Here we came across one more problem, if an allegiance had more deaths than kills,
-the KD would be 0. This can easily be fixed with the `toFloat()` function.
+the best Kill/Death Ratios, or short KDR. Here we came across one additional problem, if an allegiance had more 
+deaths than kills, the KDR would be 0. This can easily be fixed with the `toFloat()` function.
 
 ```opencypher
-MATCH (c:Character)-[death:Killed]->(c2:Character)-[l:LoyalTo]->(a:Allegiance)
-WITH a, sum(death.count) as Deaths
-MATCH (c:Character)<-[kill:Killed]-(c2:Character)-[l:LoyalTo]->(a:Allegiance)
-RETURN a.name, sum(kill.count) as Kills, Deaths, ROUND(100 *(toFLoat(sum(kill.count))/Deaths))/100 as KD
-ORDER BY KD DESC;
+MATCH (:Character)-[death:KILLED]->(:Character)-[:LOYAL_TO]->(a:Allegiance)
+WITH a, sum(death.count) as deaths
+MATCH (:Character)<-[kill:KILLED]-(:Character)-[:LOYAL_TO]->(a)
+RETURN a.name AS allegiance_name, SUM(kill.count) AS kills, deaths, ROUND(100 *(TOFLOAT(SUM(kill.count))/deaths))/100 AS KDR
+ORDER BY KDR DESC;
 ```
 
 9) One of the best-rated episodes, Battle of the Bastards, showed us a fight between two houses: Stark and Bolton.
 Let's see which one had more casualties.
 
 ```opencypher
-MATCH (c:Character)-[:LoyalTo]->(a:Allegiance)
-MATCH (c)-[:VictimIn]-(d:Death)-[:InEpisode]-(e:Episode {name: 'Battle of the Bastards'})
-RETURN a.name AS HouseName, COUNT(d) AS DeathCount
-ORDER BY DeathCount DESC
+MATCH (c:Character)-[:LOYAL_TO]->(a:Allegiance)
+MATCH (c)-[:DIED_IN]-(d:Death)-[:HAPPENED_IN]-(:Episode {name: 'Battle of the Bastards'})
+RETURN a.name AS house_name, COUNT(d) AS death_count
+ORDER BY death_count DESC
 LIMIT 2;
 ```
 
 10) Who do you think was the biggest traitor in terms of killing in its own allegiance? Well, let's check it out!
 
 ```opencypher
-MATCH (c:Character)-[:Killed]->(c2:Character)
-MATCH (c)-[:LoyalTo]->(a:Allegiance)<-[:LoyalTo]-(c2)
-RETURN c.name AS Traitor, COUNT(c2) AS Kills
-ORDER BY Kills DESC
+MATCH (killer:Character)-[:KILLED]->(victim:Character)
+MATCH (killer)-[:LOYAL_TO]->(a:Allegiance)<-[:LOYAL_TO]-(victim)
+RETURN killer.name AS traitor, COUNT(victim) AS kill_count
+ORDER BY kill_count DESC
 ```
 
 11) One of the biggest features of Memgraph is drawing the graphs of queries we execute. Let's visualize all the
 Loyalties with Characters. Execute the following query and head out to `GRAPH` tab.
 
 ```opencypher
-match (c:Character)-[i:LoyalTo]-(l) return c,i,l;
+MATCH (c:Character)-[i:LOYAL_TO]-(l) RETURN c,i,l;
 ```
 
 12) Let's see how it looks like if we want to visualize Jon Snow kills with its locations.
 
 ```opencypher
-MATCH (c:Character {name: 'Jon Snow'})-[k:Killed]->(c2:Character)
-MATCH (c)-[:KillerIn]->(d:Death)<-[di:VictimIn]-(c2)
-MATCH (d)-[i:InLocation]->(l:Location)
-return c2,di,d,i,l
+MATCH (jon:Character {name: 'Jon Snow'})-[:KILLED]->(victim:Character)
+MATCH (jon)-[:KILLED_IN]->(death:Death)<-[victim_to_death:DIED_IN]-(victim)
+MATCH (death)-[death_to_location:HAPPENED_IN]->(location:Location)
+RETURN victim,victim_to_death,death,death_to_location,location
 ```
 
 13) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most
-gruesome path of kills.
+gruesome path of kills. Example of path of kills is: `Jon Snow` killed `5` `Lannister Soldiers` and they killed
+`10` `Stark soldiers` with total `kill_count` of `15`.
 
 ```opencypher
-MATCH p = (:Character)-[:Killed * wShortest (e,v | e.count) total_weight]->(:Character)
-RETURN nodes(p) as Kills, total_weight
-ORDER BY total_weight DESC
+MATCH p = (:Character)-[:KILLED * wShortest (e,v | e.count) kill_count]->(:Character)
+RETURN nodes(p) AS kill_list, kill_count
+ORDER BY kill_count DESC
 LIMIT 1;
 ```
 
