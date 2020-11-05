@@ -23,10 +23,11 @@ or who was the biggest traitor in the show, you came to the right place!
 
 ### Data Model
 
-Although the Game of Thrones TV show is based on a series of books, our graph database contains only characters from 
-previously mentioned TV shows as the books are still not finished. This tutorial would not be possible with data analyst David 
-Murphy who shared his collection of on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths). We won't be working with kills and deaths that happened off-screen or were 
-tied to the undead (wraiths). The dataset we used was slightly modified, columns "Episode Name" and "IMDb Rating" were added.
+Although the Game of Thrones TV show is based on a series of books, our graph database contains only characters from the
+previously mentioned TV shows as the books are still not finished. This tutorial would not be possible without data analyst David 
+Murphy who shared his collection of on-screen deaths on [this link](https://data.world/datasaurusrex/game-of-thones-deaths). For more information, you can visit his [blogpost](https://datasaurus-rex.com/gallery/gotviz-mkiii) with interactive analysis 
+on the show deaths. We won't be working with kills and deaths that happened off-screen or were tied to the undead (wraiths).
+The dataset we used was slightly modified, in which columns "Episode Name" and "IMDb Rating" were added.
 
 The model consists of the following nodes:
 * a `Character` node has a `name` attribute corresponding to the character's name (e.g. `"Jon Snow"`)
