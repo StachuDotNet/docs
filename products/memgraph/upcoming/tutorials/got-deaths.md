@@ -53,6 +53,8 @@ Nodes are connected with the following edges:
   of death
 * `:PART_OF` connects node `Episode` with `Season` node which episode is part of
 
+![](../data/football_transfers_metagraph.png)
+
 ### Importing the Snapshot
 
 We have prepared a database snapshot for this example, so the user can easily
