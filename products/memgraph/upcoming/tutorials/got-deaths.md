@@ -53,7 +53,7 @@ Nodes are connected with the following edges:
   of death
 * `:PART_OF` connects node `Episode` with `Season` node which episode is part of
 
-![](../data/football_transfers_metagraph.png)
+![](../data/got-deaths.png)
 
 ### Importing the Snapshot
 
