@@ -195,7 +195,8 @@ ORDER BY kill_count DESC
 Loyalties with Characters. Execute the following query and head out to the `GRAPH` tab.
 
 ```opencypher
-MATCH (c:Character)-[i:LOYAL_TO]-(l) RETURN c,i,l;
+MATCH (character:Character)-[loyal_to:LOYAL_TO]-(allegiance)
+RETURN character, loyal_to, allegiance;
 ```
 
 11) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought
