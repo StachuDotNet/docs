@@ -182,16 +182,7 @@ ORDER BY death_count DESC
 LIMIT 2;
 ```
 
-9) Who do you think was the biggest traitor in terms of killing in its own allegiance? Well, let's check it out!
-
-```opencypher
-MATCH (killer:Character)-[:KILLED]->(victim:Character)
-MATCH (killer)-[:LOYAL_TO]->(a:Allegiance)<-[:LOYAL_TO]-(victim)
-RETURN killer.name AS traitor, COUNT(victim) AS kill_count
-ORDER BY kill_count DESC
-```
-
-10) One of the biggest features of Memgraph is drawing the graphs of queries we execute. Let's visualize all the
+9) One of the biggest features of Memgraph is drawing the graphs of queries we execute. Let's visualize all the
 Loyalties with Characters. Execute the following query and head out to the `GRAPH` tab.
 
 ```opencypher
@@ -199,7 +190,7 @@ MATCH (character:Character)-[loyal_to:LOYAL_TO]-(allegiance)
 RETURN character, loyal_to, allegiance;
 ```
 
-11) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought
+10) Remember that shocking last episode of the fifth season when they killed Jon Snow and we totally thought
 he was gonna stay dead? Well, let's list all the characters that would survive if he actually stayed dead.
 
 ```opencypher
@@ -211,7 +202,7 @@ RETURN DISTINCT(victim.name) AS victim, COUNT(victim_death) AS kill_count
 ORDER BY kill_count DESC
 ```
 
-12) If we want to see the above example in graph form, we have to add some modifications to
+11) If we want to see the above example in graph form, we have to add some modifications to
 the query, such as saving paths to variables that could be then written in `RETURN`.
 
 ```opencypher
@@ -222,7 +213,7 @@ WHERE victim_death.order > jon_death.order
 RETURN jon, killed, victim_death, died, victim;
 ```
 
-13) Let's see how it looks like if we want to visualize all of Jon Snow kills with their locations.
+12) Let's see how it looks like if we want to visualize all of Jon Snow kills with their locations.
 
 ```opencypher
 MATCH (jon:Character {name: 'Jon Snow'})-[:KILLED]->(victim:Character)
@@ -231,7 +222,7 @@ MATCH (death)-[death_to_location:HAPPENED_IN]->(location:Location)
 RETURN victim,victim_to_death,death,death_to_location,location
 ```
 
-14) Who do you think was the biggest traitor in terms of killing in its own allegiance? Well, let's check it out!
+13) Who do you think was the biggest traitor in terms of killing in its own allegiance? Well, let's check it out!
 
 ```opencypher
 MATCH (killer:Character)-[:KILLED]->(victim:Character)
@@ -240,7 +231,7 @@ RETURN killer.name AS traitor, COUNT(victim) AS kill_count
 ORDER BY kill_count DESC
 ```
 
-15) To visualize the last example, we have to add paths between nodes in the result. 
+14) To visualize the last example, we have to add paths between nodes in the result. 
 
 ```opencypher
 MATCH (killer:Character)-[killed:KILLED]->(victim:Character)
@@ -248,7 +239,7 @@ MATCH (killer)-[:LOYAL_TO]->(allegiance:Allegiance)<-[loyal_to:LOYAL_TO]-(victim
 RETURN killer, killed, victim, loyal_to, allegiance;
 ```
 
-16) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most
+15) Memgraph supports graph algorithms as well. Let's use Dijkstra's shortest path algorithm to show the most
 gruesome path of kills. An example kill path is: `Jon Snow` killed `5` `Lannister Soldiers` and they killed
 `10` `Stark soldiers` with total `kill_count` of `15`.
 
