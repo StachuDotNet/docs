@@ -55,38 +55,16 @@ Nodes are connected with the following edges:
 
 ![](../data/got-deaths.png)
 
-### Importing the Snapshot
+### Using the dataset
 
-We have prepared a database snapshot for this example, so the user can easily
-import it when starting Memgraph using the `--data-directory` option.
+You have two options for using this dataset. If you would like to execute queries
+only and observe graph results, head out to [Playground](https://playground.memgraph.com/)
+and continue your tutorial there. Note that you will not have `write` rights (CREATE, MERGE).
 
-```plaintext
-sudo -u memgraph \
-  /usr/lib/memgraph/memgraph --data-directory /usr/share/memgraph/examples/got \
-    --storage-snapshot-interval-sec=0 --storage-wal-enabled=false \
-    --storage-snapshot-on-exit=false --storage-properties-on-edges=true
-```
-
-When using Memgraph installed from DEB or RPM package, the currently running
-Memgraph server may need to be stopped before importing the example. The user
-can do so using the following command:
-
-```plaintext
-systemctl stop memgraph
-```
-
-When using Docker, the example can be imported with the following command:
-
-```plaintext
-docker run -p 7687:7687 \
-  -v mg_lib:/var/lib/memgraph -v mg_log:/var/log/memgraph -v mg_etc:/etc/memgraph \
-  memgraph --data-directory /usr/share/memgraph/examples/got \
-  --storage-snapshot-interval-sec=0 --storage-wal-enabled=false \
-  --storage-snapshot-on-exit=false --storage-properties-on-edges=true
-```
-
-The user should note that any modifications of the database state will persist
-only during this run of Memgraph.
+On the other hand, if you would like to change the database you are on, eg. add some new 
+data, download our [Lab](https://memgraph.com/product/lab) desktop application and open 
+`Datasets` tab on the sidebar. From there, pick the name of this tutorial and continue
+executing queries.
 
 ### Example Queries using OpenCypher
 
